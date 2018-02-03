@@ -64,7 +64,6 @@
         },
         mounted() {
             this.init()
-            this.debug()
         },
         destroyed() {
             this.clipboard.destroy()

@@ -3,7 +3,13 @@
         <div slot="drawer">
             <ui-appbar title=""></ui-appbar>
             <ui-list @itemClick="toggle()">
-                <ui-list-item title="首页" to="/">
+                <ui-list-item title="哈希/散列" to="/">
+                    <ui-icon slot="left" value="grade"/>
+                </ui-list-item>
+                <ui-list-item title="文件哈希值/MD5" to="/hash/file">
+                    <ui-icon slot="left" value="grade"/>
+                </ui-list-item>
+                <ui-list-item title="加密解密" to="/encrypt">
                     <ui-icon slot="left" value="grade"/>
                 </ui-list-item>
                 <ui-list-item title="关于" to="/about">
