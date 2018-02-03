@@ -16,20 +16,22 @@
                 <ui-raised-button class="btn" label="加密" primary @click="compute" />
                 <ui-raised-button class="btn" label="重新输入" @click="clear" />
             </div>
+
             <div class="result" v-if="result">
+                <ui-paper class="card">
+                    <h2 class="title">哈希值/摘要/加密结果</h2>
+                    {{ result }}
+                    <ui-icon-button class="btn-copy" icon="content_copy" title="复制" :data-clipboard-text="result" />
+                </ui-paper>
+                <!--<div class="form-item">-->
+                    <!--<textarea class="form-control" v-model="result" rows="3" placeholder="哈希值/摘要/加密结果"></textarea>-->
+                <!--</div>-->
                 <div class="form-item">
-                    <textarea class="form-control" v-model="result" rows="3" placeholder="哈希值/摘要/加密结果"></textarea>
-                </div>
-                <div class="form-item">
-                    <ui-select-field v-model="bit">
+                    <ui-checkbox class="checkbox" v-model="upper" label="结果字母大写"/>
+                    <ui-select-field class="select" v-model="bit" v-if="type === 'md5'">
                         <ui-menu-item value="32" title="32位"/>
                         <ui-menu-item value="16" title="16位"/>
                     </ui-select-field>
-                    <select class="form-control" v-model="bit" v-if="type === 'md5'">
-                        <option value="32" selected>32位</option>
-                        <option value="16">16位</option>
-                    </select>
-                    <label><input type="checkbox" v-model="upper">结果字母大写</label>
                 </div>
             </div>
         </section>
@@ -38,6 +40,7 @@
 
 <script>
     const CryptoJS = window.CryptoJS
+    const Clipboard = window.Clipboard
 
     export default {
         data () {
@@ -52,19 +55,45 @@
                         {
                             type: 'icon',
                             icon: 'help',
-                            to: '/hash/help'
+                            to: '/hash/help',
+                            title: '帮助'
                         }
                     ]
                 }
             }
         },
+        mounted() {
+            this.init()
+            this.debug()
+        },
+        destroyed() {
+            this.clipboard.destroy()
+        },
         methods: {
-            compute: function () {
+            init() {
+                this.clipboard = new Clipboard('.btn-copy')
+                this.clipboard.on('success', function (e) {
+                    console.info('Action:', e.action)
+                    console.info('Text:', e.text)
+                    console.info('Trigger:', e.trigger)
+
+                    e.clearSelection()
+                })
+                this.clipboard.on('error', function(e) {
+                    console.error('Action:', e.action)
+                    console.error('Trigger:', e.trigger)
+                })
+            },
+            debug() {
+                this.text = '123'
+                this.compute()
+            },
+            compute() {
                 switch (this.type) {
                     case 'md5':
                         this.result = CryptoJS.MD5(this.text).toString()
                         console.log(this.bit)
-                        if (parseInt(this.bit) === '16') {
+                        if (this.bit === '16') {
                             this.result = this.result.substr(8, 16)
                         }
                         break
@@ -83,12 +112,13 @@
                     this.result = this.result.toUpperCase()
                 }
             },
-            clear: function () {
+            clear() {
                 this.text = this.result = ''
             }
         },
         watch: {
             bit() {
+                console.log('bit')
                 this.compute()
             },
             upper() {
@@ -104,6 +134,26 @@
         .btn {
             margin-right: 8px;
         }
+    }
+    .card {
+        position: relative;
+        max-width: 320px;
+        padding: 16px;
+        margin-bottom: 16px;
+        word-wrap: break-word;
+        .title {
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        .btn-copy {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+    }
+    .select {
+        width: 80px;
+        margin-left: 8px;
     }
     /**/
     .input-box {
